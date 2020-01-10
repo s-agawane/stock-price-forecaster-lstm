@@ -1,1 +1,1 @@
-# django-stock-market-forecast
+# django-app-stock-price-prediction-lstm
