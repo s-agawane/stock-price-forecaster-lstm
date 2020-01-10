@@ -1,0 +1,74 @@
+{% extends "pred_app/base.html" %}
+{% load static %}
+{% block nav %}
+<li>
+    <a href="index">
+        Home
+    </a>
+</li>
+<li>
+    <a href="pred">
+        Prediction
+    </a>
+</li>
+<li class="active">
+    <a href="contact">
+        Contact Us
+    </a>
+</li>
+{% endblock nav %}
+{% block content %}
+<div class="content">
+    <div class="article">
+        <h2>
+            <span>
+                To Contact Us
+            </span>
+        </h2>
+        <div class="clr">
+        </div>
+    </div>
+    <div class="article">
+        <h2>
+            <span>
+                Send us
+            </span>
+            mail
+        </h2>
+        <div class="clr">
+        </div>
+        <form action="#" id="sendemail" method="post">
+            <ol>
+                <li>
+                    <label for="name">
+                        Name (required)
+                    </label>
+                    <input class="text" id="name" name="name"/>
+                </li>
+                <li>
+                    <label for="email">
+                        Email Address (required)
+                    </label>
+                    <input class="text" id="email" name="email"/>
+                </li>
+                <li>
+                    <label for="website">
+                        Website
+                    </label>
+                    <input class="text" id="website" name="website"/>
+                </li>
+                <li>
+                    <label for="message">
+                        Your Message
+                    </label>
+                    <textarea cols="50" id="message" name="message" rows="8">
+                    </textarea>
+                </li>
+                <li>
+                    <input class="send" id="imageField" name="imageField" src="{% static 'pred_app/img/submit.gif' %}" type="image"/>
+                </li>
+            </ol>
+        </form>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,264 @@
+{% extends "pred_app/base.html" %}
+{% load static %}
+{% block nav %}
+<li>
+    <a href="/pred_app/index">
+        Home
+    </a>
+</li>
+<li class="active">
+    <a href="/pred_app/pred">
+        Prediction
+    </a>
+</li>
+<li>
+    <a href="/pred_app/contact">
+        Contact Us
+    </a>
+</li>
+{% endblock nav %}
+{% block content %}
+<!-- Styles -->
+<style>
+#chartdiv {
+  width: 100%;
+  height: 500px;
+  max-width: 100%;
+}
+</style>
+
+<!-- Resources -->
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/material.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+<!-- Chart code -->
+<script>
+am4core.ready(function() {
+
+// Themes begin
+am4core.useTheme(am4themes_material);
+am4core.useTheme(am4themes_animated);
+// Themes end
+
+// Create chart
+var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.padding(0, 15, 0, 15);
+
+// Load external data
+var jsonObject = JSON.parse('{{ predicted_result_df | escapejs}}');
+chart.data = jsonObject
+
+// the following line makes value axes to be arranged vertically.
+chart.leftAxesContainer.layout = "vertical";
+
+// uncomment this line if you want to change order of axes
+//chart.bottomAxesContainer.reverseOrder = true;
+
+var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+dateAxis.renderer.grid.template.location = 0;
+dateAxis.renderer.ticks.template.length = 8;
+dateAxis.renderer.ticks.template.strokeOpacity = 0.1;
+dateAxis.renderer.grid.template.disabled = true;
+dateAxis.renderer.ticks.template.disabled = false;
+dateAxis.renderer.ticks.template.strokeOpacity = 0.2;
+dateAxis.renderer.minLabelPosition = 0.01;
+dateAxis.renderer.maxLabelPosition = 0.99;
+dateAxis.keepSelection = true;
+dateAxis.minHeight = 30;
+
+dateAxis.groupData = true;
+dateAxis.minZoomCount = 5;
+
+// these two lines makes the axis to be initially zoomed-in
+// dateAxis.start = 0.7;
+// dateAxis.keepSelection = true;
+
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+valueAxis.tooltip.disabled = true;
+valueAxis.zIndex = 1;
+valueAxis.renderer.baseGrid.disabled = true;
+// height of axis
+valueAxis.height = am4core.percent(65);
+
+valueAxis.renderer.gridContainer.background.fill = am4core.color("#000000");
+valueAxis.renderer.gridContainer.background.fillOpacity = 0.05;
+valueAxis.renderer.inside = true;
+valueAxis.renderer.labels.template.verticalCenter = "bottom";
+valueAxis.renderer.labels.template.padding(2, 2, 2, 2);
+
+//valueAxis.renderer.maxLabelPosition = 0.95;
+valueAxis.renderer.fontSize = "0.8em"
+
+var series = chart.series.push(new am4charts.LineSeries());
+series.dataFields.dateX = "Date";
+series.dataFields.valueY = "Close";
+series.tooltipText = "{valueY.value}";
+series.name = "MSFT: Value";
+series.defaultState.transitionDuration = 0;
+
+var valueAxis2 = chart.yAxes.push(new am4charts.ValueAxis());
+valueAxis2.tooltip.disabled = true;
+// height of axis
+valueAxis2.height = am4core.percent(35);
+valueAxis2.zIndex = 3
+// this makes gap between panels
+valueAxis2.marginTop = 30;
+valueAxis2.renderer.baseGrid.disabled = true;
+valueAxis2.renderer.inside = true;
+valueAxis2.renderer.labels.template.verticalCenter = "bottom";
+valueAxis2.renderer.labels.template.padding(2, 2, 2, 2);
+//valueAxis.renderer.maxLabelPosition = 0.95;
+valueAxis2.renderer.fontSize = "0.8em"
+
+valueAxis2.renderer.gridContainer.background.fill = am4core.color("#000000");
+valueAxis2.renderer.gridContainer.background.fillOpacity = 0.05;
+
+
+chart.cursor = new am4charts.XYCursor();
+
+var scrollbarX = new am4charts.XYChartScrollbar();
+scrollbarX.series.push(series);
+scrollbarX.marginBottom = 20;
+scrollbarX.scrollbarChart.xAxes.getIndex(0).minHeight = undefined;
+chart.scrollbarX = scrollbarX;
+
+
+/**
+ * Set up external controls
+ */
+
+// Date format to be used in input fields
+var inputFieldFormat = "yyyy-MM-dd";
+
+document.getElementById("b1m").addEventListener("click", function() {
+  resetButtonClass();
+  var max = dateAxis.groupMax["day1"];
+  var date = new Date(max);
+  date.setMonth(date.getMonth() - 1);
+
+  dateAxis.zoomToDates(
+    date,
+    new Date(max)
+  );
+  //this.className = "amcharts-input amcharts-input-selected";
+});
+
+document.getElementById("b3m").addEventListener("click", function() {
+  resetButtonClass();
+  var max = dateAxis.groupMax["day1"];
+  var date = new Date(max);
+  date.setMonth(date.getMonth() - 3);
+
+  dateAxis.zoomToDates(
+    date,
+    new Date(max)
+  );
+  //this.className = "amcharts-input amcharts-input-selected";
+});
+
+document.getElementById("b6m").addEventListener("click", function() {
+  resetButtonClass();
+  var max = dateAxis.groupMax["day1"];
+  var date = new Date(max);
+  date.setMonth(date.getMonth() - 6);
+
+  dateAxis.zoomToDates(
+    date,
+    new Date(max)
+  );
+  //this.className = "amcharts-input amcharts-input-selected";
+});
+
+document.getElementById("b1y").addEventListener("click", function() {
+  resetButtonClass();
+  var max = dateAxis.groupMax["week1"];
+  var date = new Date(max);
+  date.setFullYear(date.getFullYear() - 1);
+
+  dateAxis.zoomToDates(
+    date,
+    new Date(max)
+  );
+  //this.className = "amcharts-input amcharts-input-selected";
+});
+
+document.getElementById("bytd").addEventListener("click", function() {
+  resetButtonClass();
+  var date = new Date(dateAxis.max);
+  date.setMonth(0, 1);
+  date.setHours(0, 0, 0, 0);
+  dateAxis.zoomToDates(date, new Date(dateAxis.max));
+  //this.className = "amcharts-input amcharts-input-selected";
+});
+
+document.getElementById("bmax").addEventListener("click", function() {
+  resetButtonClass();
+  dateAxis.zoom({start:0, end:1});
+  //this.className = "amcharts-input amcharts-input-selected";
+});
+
+function resetButtonClass() {
+  var selected = document.getElementsByClassName("amcharts-input-selected");
+  for(var i = 0; i < selected.length; i++) {
+    selected[i].className = "amcharts-input";
+  }
+}
+
+dateAxis.events.on("selectionextremeschanged", function() {
+  updateFields();
+});
+
+dateAxis.events.on("extremeschanged", updateFields);
+
+function updateFields() {
+  var minZoomed = dateAxis.minZoomed + am4core.time.getDuration(dateAxis.mainBaseInterval.timeUnit, dateAxis.mainBaseInterval.count) * 0.5;
+  document.getElementById("fromfield").value = chart.dateFormatter.format(minZoomed, inputFieldFormat);
+  document.getElementById("tofield").value = chart.dateFormatter.format(new Date(dateAxis.maxZoomed), inputFieldFormat);
+}
+
+document.getElementById("fromfield").addEventListener("keyup", updateZoom);
+document.getElementById("tofield").addEventListener("keyup", updateZoom);
+
+var zoomTimeout;
+function updateZoom() {
+  if (zoomTimeout) {
+    clearTimeout(zoomTimeout);
+  }
+  zoomTimeout = setTimeout(function() {
+    resetButtonClass();
+    var start = document.getElementById("fromfield").value;
+    var end = document.getElementById("tofield").value;
+    if ((start.length < inputFieldFormat.length) || (end.length < inputFieldFormat.length)) {
+      return;
+    }
+    var startDate = chart.dateFormatter.parse(start, inputFieldFormat);
+    var endDate = chart.dateFormatter.parse(end, inputFieldFormat);
+
+    if (startDate && endDate) {
+      dateAxis.zoomToDates(startDate, endDate);
+    }
+  }, 500);
+}
+
+}); // end am4core.ready()
+</script>
+
+<!-- HTML -->
+    <div id="controls" style="width: 100%; overflow: hidden;">
+    <div style="float: left; margin-left: 15px;">
+    From: <input type="text" id="fromfield" class="amcharts-input" />
+    To: <input type="text" id="tofield" class="amcharts-input" />
+    </div>
+    <div style="float: right; margin-right: 15px;">
+    <button id="b1m" class="amcharts-input">1m</button>
+    <button id="b3m" class="amcharts-input">3m</button>
+    <button id="b6m" class="amcharts-input">6m</button>
+    <button id="b1y" class="amcharts-input">1y</button>
+    <button id="bytd" class="amcharts-input">YTD</button>
+    <button id="bmax" class="amcharts-input">MAX</button>
+    </div>
+    </div>
+<div id="chartdiv"></div>
+{% endblock content %}
