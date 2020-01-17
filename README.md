@@ -1,5 +1,5 @@
 # django-app-stock-price-prediction-lstm
-A Django app to predict realtime stock market prices for NSE India and NYSE using LSTM.
+A Django app to predict realtime stock market prices for NSE and NYSE using LSTM machine learning model.
 Users can select from a predefined list of stock names to predict the prices.
 ## Built With
 
