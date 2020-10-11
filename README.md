@@ -1,4 +1,4 @@
-# django-app-stock-price-forecster-lstm
+# stock-price-forecster-lstm
 A Django app to predict realtime stock market prices for NSE and NYSE using LSTM machine learning model.
 Users can select from a predefined list of stock names to predict the prices.
 ## Built With
